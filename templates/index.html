@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Laptop Price Predictor</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #121212;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 800px;
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+label {
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: #00b894;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+button:hover {
+    background: #00a383;
+}
+
+.result {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 20px;
+    color: #00ffae;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+<h1>Laptop Price Predictor</h1>
+
+<form action="/predict" method="POST">
+
+<div class="form-grid">
+
+<!-- COMPANY -->
+<div>
+<label>Company</label>
+<select name="Company">
+<option>Acer</option>
+<option>Apple</option>
+<option>Asus</option>
+<option>Dell</option>
+<option>Fujitsu</option>
+<option>Google</option>
+<option>HP</option>
+<option>Huawei</option>
+<option>LG</option>
+<option>Lenovo</option>
+<option>MSI</option>
+<option>Mediacom</option>
+<option>Microsoft</option>
+<option>Razer</option>
+<option>Samsung</option>
+<option>Toshiba</option>
+<option>Xiaomi</option>
+</select>
+</div>
+
+<!-- TYPE -->
+<div>
+<label>Type</label>
+<select name="TypeName">
+<option>2 in 1 Convertible</option>
+<option>Gaming</option>
+<option>Netbook</option>
+<option>Notebook</option>
+<option>Ultrabook</option>
+<option>Workstation</option>
+</select>
+</div>
+
+<!-- INCHES -->
+<div>
+<label>Screen Size</label>
+<select name="Inches">
+<option>11.3</option>
+<option>11.6</option>
+<option>12.0</option>
+<option>12.3</option>
+<option>12.5</option>
+<option>13.0</option>
+<option>13.3</option>
+<option>13.5</option>
+<option>13.9</option>
+<option>14.0</option>
+<option>15.0</option>
+<option>15.6</option>
+<option>17.0</option>
+<option>17.3</option>
+<option>18.4</option>
+</select>
+</div>
+
+<!-- RAM -->
+<div>
+<label>RAM</label>
+<select name="Ram">
+<option>4GB</option>
+<option>6GB</option>
+<option>8GB</option>
+<option>12GB</option>
+<option>16GB</option>
+<option>24GB</option>
+<option>32GB</option>
+<option>64GB</option>
+</select>
+</div>
+
+<!-- CPU BRAND -->
+<div>
+<label>CPU Brand</label>
+<select name="Cpu Brand" id="cpuBrand">
+<option>AMD</option>
+<option>Intel</option>
+</select>
+</div>
+
+<!-- CPU MODEL -->
+<div>
+<label>CPU Model</label>
+<select name="Cpu Model" id="cpuModel"></select>
+</div>
+
+<!-- GPU BRAND -->
+<div>
+<label>GPU Brand</label>
+<select name="Gpu Brand" id="gpuBrand">
+<option>AMD</option>
+<option>Intel</option>
+<option>Nvidia</option>
+</select>
+</div>
+
+<!-- GPU MODEL -->
+<div>
+<label>GPU Model</label>
+<select name="Gpu Model" id="gpuModel"></select>
+</div>
+
+<!-- SCREEN -->
+<div>
+<label>Screen Resolution</label>
+<select name="ScreenResolution">
+<option>Full HD 1920x1080</option>
+<option>1366x768</option>
+<option>IPS Panel Full HD 1920x1080</option>
+<option>4K Ultra HD 3840x2160</option>
+<option>Touchscreen 2560x1440</option>
+</select>
+</div>
+
+<!-- STORAGE -->
+<div>
+<label>SSD</label>
+<select name="SSD">
+<option>0</option>
+<option>64</option>
+<option>128</option>
+<option>180</option>
+<option>240</option>
+<option>256</option>
+<option>512</option>
+</select>
+</div>
+
+<div>
+<label>HDD</label>
+<select name="HDD">
+<option>0</option>
+<option>1</option>
+<option>2</option>
+<option>10</option>
+<option>32</option>
+<option>128</option>
+<option>500</option>
+</select>
+</div>
+
+</div>
+
+<button type="submit">Predict Price</button>
+
+</form>
+
+{% if prediction_text %}
+<div class="result">
+{{ prediction_text }}
+</div>
+{% endif %}
+
+</div>
+
+<script>
+// CPU + GPU logic
+const cpuMap = {
+    "Intel": [
+        "Core i3 6006U", "Core i3 6100U", "Core i3 7100U", "Core i3 7130U",
+        "Core i5 6200U", "Core i5 6260U", "Core i5 6300U", "Core i5 6300HQ",
+        "Core i5 6440HQ", "Core i5 7200U", "Core i5 7300U", "Core i5 7300HQ",
+        "Core i5 7440HQ", "Core i5 7500U", "Core i7 6500U", "Core i7 6560U",
+        "Core i7 6600U", "Core i7 6700HQ", "Core i7 6820HQ", "Core i7 6820HK",
+        "Core i7 6920HQ", "Core i7 7500U", "Core i7 7560U", "Core i7 7600U",
+        "Core i7 7700HQ", "Core i7 7820HQ", "Core i7 7820HK", "Core i7 7Y75",
+        "Core i7 7Y75", "Core i7 8550U", "Core i7 8650U",
+        "Core i5 7Y54", "Core i5 7Y57",
+        "Core M", "Core M 6Y30", "Core M 6Y54", "Core M 6Y75",
+        "Core M 7Y30", "Core M m7-6Y75",
+        "Xeon E3-1505M V6", "Xeon E3-1535M v6",
+        "Atom Z8350"
+    ],
+
+    "AMD": [
+        "A4-Series 7210",
+        "A6-Series 7310", "A6-Series 9220",
+        "A8-Series 7410",
+        "A9-Series 9420", "A9-Series A9-9420", "A9-Series 9410",
+        "A10-Series 9600P", "A10-Series 9620P", "A10-Series A10-9620P",
+        "A12-Series 9700P", "A12-Series 9720P",
+        "E-Series 6110", "E-Series 7110", "E-Series 9000", "E-Series 9000e",
+        "FX 8800P", "FX 9830P",
+        "Ryzen 1600", "Ryzen 1700"
+    ]
+};
+
+const gpuMap = {
+    "Intel": [
+        "HD Graphics", "HD Graphics 520", "HD Graphics 615", "HD Graphics 620",
+        "HD Graphics 630", "HD Graphics 400",
+        "UHD Graphics 620",
+        "Iris Graphics 540",
+        "Plus Graphics 640",
+        "Graphics 620", "Graphics 620 "
+    ],
+
+    "AMD": [
+        "Radeon R2", "Radeon R2 Graphics",
+        "Radeon R3",
+        "Radeon R4", "Radeon R4 Graphics",
+        "Radeon R5", "Radeon R5 430", "Radeon R5 520", "Radeon R5 M315",
+        "Radeon R5 M330", "Radeon R5 M420", "Radeon R5 M420X", "Radeon R5 M430",
+        "Radeon R7", "Radeon R7 Graphics", "Radeon R7 M360", "Radeon R7 M365X",
+        "Radeon R7 M440", "Radeon R7 M445", "Radeon R7 M460", "Radeon R7 M465",
+        "Radeon RX 540", "Radeon RX 550", "Radeon RX 560", "Radeon RX 580",
+        "Radeon 520", "Radeon 530", "Radeon 540",
+        "FirePro W4190M", "FirePro W5130M", "FirePro W6150M"
+    ],
+
+    "Nvidia": [
+        "GeForce 920", "GeForce 920M", "GeForce 920MX", "GeForce 920MX ",
+        "GeForce 930M", "GeForce 930MX", "GeForce 930MX ",
+        "GeForce 940M", "GeForce 940MX", "GeForce GT 940MX",
+        "GeForce MX130", "GeForce MX150", "GeForce 150MX",
+        "GeForce GTX 1050", "GTX 1050 Ti", "GeForce GTX 1050M",
+        "GeForce GTX 1060", "GeForce GTX1060",
+        "GeForce GTX 1070", "GeForce GTX 1070M",
+        "GeForce GTX 1080",
+        "GeForce GTX 930MX",
+        "GeForce GTX 940M",
+        "GeForce GTX 950M",
+        "GeForce GTX 960", "GeForce GTX 960M",
+        "GeForce GTX 965M",
+        "GeForce GTX 970M",
+        "GeForce GTX 980M",
+        "GTX 980 SLI", "GTX 980 ",
+        "Quadro M1000M", "Quadro M1200", "Quadro M2000M",
+        "Quadro M2200", "Quadro M2200M",
+        "Quadro M3000M",
+        "Quadro M500M",
+        "Quadro M520M",
+        "Quadro M620", "Quadro M620M"
+    ]
+};
+
+function updateSelect(select, values) {
+    select.innerHTML = "";
+    values.sort().forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+    });
+}
+
+// CPU
+document.getElementById("cpuBrand").addEventListener("change", function() {
+    updateSelect(document.getElementById("cpuModel"), cpuMap[this.value]);
+});
+
+// GPU
+document.getElementById("gpuBrand").addEventListener("change", function() {
+    updateSelect(document.getElementById("gpuModel"), gpuMap[this.value]);
+});
+
+// init
+updateSelect(document.getElementById("cpuModel"), cpuMap["Intel"]);
+updateSelect(document.getElementById("gpuModel"), gpuMap["Intel"]);
+</script>
+
+</body>
+</html>
